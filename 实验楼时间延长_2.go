@@ -15,6 +15,10 @@ func main() {
 
 func dispatch() {
 	var next,surplusTime int
+	var maxRunTime int
+	fmt.Print("请输入最大运行次数:")
+	fmt.Scanln(&maxRunTime)
+	maxRunTime=int(maxRunTime)
 	var url_select string = "https://www.shiyanlou.com/api/v2/labtask/"
 	var url_repost string = "https://www.shiyanlou.com/api/v2/labtask/extend/"
 	for{
@@ -22,15 +26,20 @@ func dispatch() {
 		surplusTime = examineAndGetTime(url_select)
 		next = (surplusTime/60)/2 //下一次检查时间(分钟)
 		fmt.Println("剩余时间:",surplusTime/60,"分","下一次检查:",next,"分")
-		if next>8 {
-			time.Sleep(time.Minute*time.Duration(next))
+		if maxRunTime>0 {
+			if next>8 {
+				time.Sleep(time.Minute*time.Duration(next))
+			}else {
+				RepostponeShiyanlou(url_repost)
+				maxRunTime--
+				fmt.Println("执行了时间延长,剩余运行次数:",maxRunTime,"次")
+				fmt.Println("一分钟后进行下一次检查...")
+				time.Sleep(time.Minute*1)
+			}
 		}else {
-			RepostponeShiyanlou(url_repost)
-			fmt.Println("执行了时间延长")
-			fmt.Println("一分钟后进行下一次检查...")
-			time.Sleep(time.Minute*1)
-
+			return
 		}
+
 	}
 
 }
