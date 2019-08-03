@@ -23,11 +23,11 @@ func dispatch() {
 	var url_repost string = "https://www.shiyanlou.com/api/v2/labtask/extend/"
 	for{
 		fmt.Println("dispatch is running!")
-		surplusTime = examineAndGetTime(url_select)
-		next = (surplusTime/60)/2 //下一次检查时间(分钟)
-		fmt.Println("剩余时间:",surplusTime/60,"分","下一次检查:",next,"分")
+		surplusTime = examineAndGetTime(url_select)/60 //实验剩余时间(分钟)
+		next = surplusTime/2 //下一次检查时间(分钟)
+		fmt.Println("剩余时间:",surplusTime,"分","下一次检查:",next,"分")
 		if maxRunTime>0 {
-			if next>8 {
+			if surplusTime>8 {
 				time.Sleep(time.Minute*time.Duration(next))
 			}else {
 				RepostponeShiyanlou(url_repost)
