@@ -25,7 +25,11 @@ func dispatch() {
 		fmt.Println("dispatch is running!")
 		surplusTime = examineAndGetTime(url_select)/60 //实验剩余时间(分钟)
 		next = surplusTime/2 //下一次检查时间(分钟)
-		fmt.Println("剩余时间:",surplusTime,"分","下一次检查:",next,"分")
+		if surplusTime>8 {
+			fmt.Println("剩余时间:",surplusTime,"分","下一次检查:",next,"分")
+		}else {
+			fmt.Print(">>>剩余时间小于8分钟,即将开始执行延长请求<<<")
+		}
 		if maxRunTime>0 {
 			if surplusTime>8 {
 				time.Sleep(time.Minute*time.Duration(next))
