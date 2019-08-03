@@ -28,8 +28,9 @@ func dispatch() {
 		if surplusTime>8 {
 			fmt.Println("剩余时间:",surplusTime,"分","下一次检查:",next,"分")
 		}else {
-			fmt.Print(">>>剩余时间小于8分钟,即将开始执行延长请求<<<")
+			fmt.Println(">>>剩余时间小于8分钟,即将开始执行延长请求<<<")
 		}
+
 		if maxRunTime>0 {
 			if surplusTime>8 {
 				time.Sleep(time.Minute*time.Duration(next))
@@ -41,6 +42,7 @@ func dispatch() {
 				time.Sleep(time.Minute*1)
 			}
 		}else {
+			fmt.Println("所有任务已经完成,程序即将退出...")
 			return
 		}
 
