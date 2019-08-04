@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/pkg/errors"
 	"io/ioutil"
 	"net/http"
 	"time"
@@ -14,6 +15,7 @@ func main() {
 }
 
 func dispatch() {
+	var err error
 	var next,surplusTime int
 	var maxRunTime int
 	fmt.Print("请输入最大运行次数:")
@@ -23,14 +25,22 @@ func dispatch() {
 	var url_repost string = "https://www.shiyanlou.com/api/v2/labtask/extend/"
 	for{
 		fmt.Println("dispatch is running!")
-		surplusTime = examineAndGetTime(url_select)/60 //实验剩余时间(分钟)
-		next = surplusTime/2 //下一次检查时间(分钟)
-		if surplusTime>8 {
-			fmt.Println("剩余时间:",surplusTime,"分","下一次检查:",next,"分")
+		surplusTime,err = examineAndGetTime(url_select) //实验剩余时间(分钟)
+		if err != nil {
+			maxRunTime = 0
 		}else {
-			fmt.Println(">>>剩余时间小于8分钟,即将开始执行延长请求<<<")
+			surplusTime/=60
 		}
-
+		next = surplusTime/2 //下一次检查时间(分钟)
+		if maxRunTime>0 {
+			if surplusTime<8 {
+				fmt.Println(">>>剩余时间小于8分钟,即将开始执行延长请求<<<")
+			}else {
+				fmt.Println("剩余时间:",surplusTime,"分","下一次检查:",next,"分")
+			}
+		}else {
+			//do nothing
+		}
 		if maxRunTime>0 {
 			if surplusTime>8 {
 				time.Sleep(time.Minute*time.Duration(next))
@@ -43,6 +53,7 @@ func dispatch() {
 			}
 		}else {
 			fmt.Println("所有任务已经完成,程序即将退出...")
+			time.Sleep(time.Minute*1)
 			return
 		}
 
@@ -50,9 +61,9 @@ func dispatch() {
 
 }
 
-func examineAndGetTime(url string) (surplusTime int) {
+func examineAndGetTime(url string) (surplusTime int,err error){
 	datas :=map[string]interface{}{}
-
+	var result int
 	req, _ := http.NewRequest("GET", url, nil)
 ***CREDENTIAL_REMOVED_BY_REPOCURATOR***
 	req.Header.Add("User-Agent", "PostmanRuntime/7.15.2")
@@ -72,13 +83,20 @@ func examineAndGetTime(url string) (surplusTime int) {
 	fmt.Println(res)
 	fmt.Println(string(body))
 	if err := json.Unmarshal(body, &datas); err != nil {
+		datas = nil
 		println("body to map error!",err)
 	}
+	if datas!=nil {
+		result = int(datas["ttl_seconds"].(float64))
+		err = nil
+		fmt.Println("The ttl_seconds is:", result)
+	}else {
+		result = -1
+		err = errors.New("获取剩余时间失败,可能是由于当前无实验任务导致!")
+	}
 
-	result:= int(datas["ttl_seconds"].(float64))
-	fmt.Println("The ttl_seconds is:", result)
 	fmt.Println("---------------------examineTime End---------------------")
-	return result
+	return result,err
 }
 
 func RepostponeShiyanlou(url string) {
