@@ -2,25 +2,32 @@ package main
 
 import (
 	"encoding/json"
+	"flag"
 	"fmt"
 	"github.com/pkg/errors"
 	"io/ioutil"
 	"net/http"
 	"time"
 )
-
+var maxRunTime int
+func init() {
+	flag.IntVar(&maxRunTime,"max",3,"最大运行次数")
+}
 func main() {
 	fmt.Println("Program is running!")
+	flag.Parse()
+	println(maxRunTime)
 	dispatch()
 }
 
 func dispatch() {
 	var err error
 	var next,surplusTime int
-	var maxRunTime int
-	fmt.Print("请输入最大运行次数:")
-	fmt.Scanln(&maxRunTime)
-	maxRunTime=int(maxRunTime)
+	//var maxRunTime int
+	//fmt.Print("请输入最大运行次数:")
+	//fmt.Scanln(&maxRunTime)
+	fmt.Println("最大运行次数为:",maxRunTime)
+	//maxRunTime=int(maxRunTime)
 	var url_select string = "https://www.shiyanlou.com/api/v2/labtask/"
 	var url_repost string = "https://www.shiyanlou.com/api/v2/labtask/extend/"
 	for{
