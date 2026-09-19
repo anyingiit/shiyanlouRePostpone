@@ -3,9 +3,10 @@
 
 # ShiyanlouRePostpone
 
-Shiyanlou re postpone: no README or manifest to go on; based on its name, built with Go, this looks like a software project — open the repository to confirm.
+A personal Go command-line tool that polls the Shiyanlou learning platform's own API for a lab task's remaining time and submits an extension request to push back the deadline until a configured number of extensions have been used.
 
-[![CI](https://github.com/anyingiit/shiyanlouRePostpone/actions/workflows/ci.yml/badge.svg)](https://github.com/anyingiit/shiyanlouRePostpone/actions/workflows/ci.yml)
+**English** · [简体中文](README.zh-CN.md)
+
 [![License](https://img.shields.io/github/license/anyingiit/shiyanlouRePostpone)](LICENSE)
 
 [Report a bug](https://github.com/anyingiit/shiyanlouRePostpone/issues/new?template=bug_report.yml) · [Request a feature](https://github.com/anyingiit/shiyanlouRePostpone/issues/new?template=feature_request.yml)
@@ -24,7 +25,7 @@ Shiyanlou re postpone: no README or manifest to go on; based on its name, built 
 
 ## About The Project
 
-Shiyanlou re postpone: no README or manifest to go on; based on its name, built with Go, this looks like a software project — open the repository to confirm.
+ShiyanlouRePostpone is a single Go program at the repository root that automates renewing a lab session on the Shiyanlou online-course platform. It calls Shiyanlou's own `labtask` API to read the minutes remaining on the current task, and once fewer than eight minutes are left it calls the matching extend endpoint to push the deadline back, repeating until a `-max`-flag-controlled number of extensions have been used. A second, unrelated file under `testProgram/` is a scratch program for experimenting with Go's `flag` package and does not talk to Shiyanlou at all.
 
 See the [open issues](https://github.com/anyingiit/shiyanlouRePostpone/issues) for planned features and known issues.
 
@@ -32,20 +33,32 @@ See the [open issues](https://github.com/anyingiit/shiyanlouRePostpone/issues) f
 
 ### Prerequisites
 
-- Git
+- Go (a recent release with module support; no `go.mod` is committed, so no minimum version is pinned)
+- Network access to fetch `github.com/pkg/errors`, the program's one third-party import
+- A Shiyanlou session cookie of your own: the request-header line that once carried a hardcoded one has been redacted from the repository's Go source file, so it will not compile until you add your own (see Installation)
 
 ### Installation
 
 ```sh
 git clone https://github.com/anyingiit/shiyanlouRePostpone.git
 cd shiyanlouRePostpone
+go mod init shiyanlourepostpone
+go mod tidy
+```
+
+The Go file at the repository root had a hardcoded Shiyanlou session-cookie header removed from two functions; add the missing header back with your own cookie before it will build:
+
+```go
+req.Header.Add("Cookie", "<your-own-shiyanlou-session-cookie>")
 ```
 
 ## Usage
 
 ```sh
-shiyanlouRePostpone --help
+go run 实验楼时间延长_2.go -max 5
 ```
+
+This starts the loop described above with `-max` set to 5 (the default is 3): it checks the task's remaining time, waits until fewer than eight minutes are left, extends it, and repeats up to that many times before exiting on its own.
 
 ## Contributing
 
